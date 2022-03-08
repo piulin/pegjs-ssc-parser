@@ -123,7 +123,7 @@ In the following lines you will see the contents of a toy SSC file that will ser
 
 A parse is a dictionary with the following structure
 
-```json
+```javascript
 {
   header: {...},
   levels: [...]
@@ -134,7 +134,7 @@ where the value of `header` is a dictionary containing all entries found in the 
 
 The actual values of each entry depend only on their content:
 1. Single-valued entries in the SSC definition, e.g. `#TITLE:Elvis;` and `#OFFSET:-0.281000;`, will translate into single-valued values in the resulting dictionary, namely:
-```json
+```javascript
 {
       header: {
             TITLE: "Elvis",
@@ -151,7 +151,7 @@ The actual values of each entry depend only on their content:
  ;
 ```
 will translate into array-shaped values in the resulting dictionary. Separator `,` creates the first level array, whilst separators `=` and `:` create last level:
-```json
+```javascript
 {
       header: {
             SPEEDS: [ [ 0, 1, 0, 0 ], [ 0, 1, 0, 0 ] ],
@@ -162,7 +162,7 @@ will translate into array-shaped values in the resulting dictionary. Separator `
 ```
 
 3. The `#NOTES` entry is shaped as an array of arrays, where the first layer consists of all bars, and the second layer has the notes for each bar. The possible note symbols in this entry, as defined in the grammar, are the following: `[01234567FMxXyY{}|nZzhLvs*BSEIa]`. I don't really know what these symbols stand for besides `0`, `1`, `2`, and `3`. The parse of this entry with the content of the previous toy example results in the following dictionary:
-```json
+```javascript
 {
       header: {...},
       levels: [{
@@ -216,7 +216,7 @@ Make sure that you create the associated files under `parsers/` after any modifi
 In this respository it is also bundled a small utility that will check that the SSC files in your STEPMANIA Song folder are correct. You can find it in `utils/checkSSCs.js`.
 
 The command-line syntax is the following:
-```
+```bash
 checkSSCs.js <songsFolderPath>
 ```
 where `songsFolderPath` is the path containing all the songs with its associated SSC files. Another files can be present but they will be disregarded.
