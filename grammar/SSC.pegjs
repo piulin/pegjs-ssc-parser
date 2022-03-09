@@ -17,6 +17,31 @@
  *
  */
 
+{
+    function isNumeric(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    function getSpecialNotes(bars) {
+        let specialNotes = new Set() ;
+        for ( let bar of bars ) {
+            for (let notes of bar) {
+                for (let i = 0; i < notes.length; i++) {
+                    const note = notes[i];
+                    if ( note !== '0' && note !== '1' && note !== '2' && note !== '3' ) {
+                        if ( typeof note === 'object' ) {
+                            specialNotes.add('StepF2') ;
+                        } else {
+                            specialNotes.add(note) ;
+                        }
+                    }
+                }
+            }
+        }
+        return specialNotes ;
+    }
+}
+
 start
     = _ header:header levels:level* {
         return {
@@ -56,35 +81,19 @@ item_separator
 valid_char
     = [^;:=,\n/]
 string
-    = valid_char* (!"//" "/" valid_char*)*  { return text().trim() ; }
-
-integer
-    = num: [0-9]+ { return num.join("") ; }
-
-float_a
-    = integer:integer "." { return integer ; }
-
-float_b
-    = number:integer? "." decimal:integer {
-        number = number === null ? '0' : number ;
-        return number+"."+decimal ;
-    }
-unsigned_number
-    = float_b / float_a / integer
-
-number
-    =  sign:[+-]? unsigned_number:unsigned_number {
-        sign = sign === null ? '' : sign ;
-        return parseFloat(sign+unsigned_number) ;
+    = valid_char* (!"//" "/" valid_char*)* {
+        const val = text().trim() ;
+        if ( isNumeric(val) ) {
+            return parseFloat(val) ;
+        }
+        return val ;
     }
 
 key
     = "#" string:string { return string ; }
 
 item
-    = number:(
-        !([+-]?[0-9]*("."[0-9]*)? [^0-9,=;:\n\r]) number:number { return number ; }
-    ) / string:string
+    = string
 
 composition
     = items:(
@@ -133,11 +142,31 @@ _n
 note_separator
     = _n [\n\r] _n
 
+note_symbol
+    = [01234567XxYyZzVHFMLK*BSEIa]
+
+// https://github.com/stepmania/stepmania/wiki/Note-Types
+compressed_note
+    = "{" note:note_symbol* "}" {
+        return note ;
+    }
+
+stepF2_note
+    = "{" type:note_symbol "|" attribute:[nvsh] "|" fake:[01] "|" reserved:. "}" {
+        return {
+            'type': type,
+            'attribute':attribute,
+            'fake': fake,
+            'reserved': reserved
+        } ;
+    }
+
 valid_note
-    = note:[01234567FMxXyY{}|nZzhLvs*BSEIa]
+    = (!stepF2_note cn:compressed_note {return cn;} )
+     / stepF2_note / note_symbol
 
 note_item
-    = note_separator* notes:valid_note+ note_separator { return notes.join("") ; }
+    = note_separator* notes:valid_note+ note_separator { return notes ; }
 bar
     = note_item*
 
@@ -151,20 +180,10 @@ notes
 
 notes_entry
     = &notes_literal key:key key_value_separator value:notes end_sentence {
-        let specialNotes = false ;
-        for ( let bar of value ) {
-            for (let notes of bar) {
-                for (let i = 0; i < notes.length; i++) {
-                    const note = notes.charAt(i);
-                    if ( note !== '0' && note !== '1' && note !== '2' && note !== '3' ) {
-                        specialNotes = true ;
-                        break ;
-                    }
-                }
-            }
-        }
         return {[key]: value,
-                SPECIALNOTES: specialNotes } ;
+                SPECIALNOTES: getSpecialNotes(value) } ;
+
+        // return {[key]: value } ;
     }
 
 

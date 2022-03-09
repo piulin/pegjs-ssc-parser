@@ -13,7 +13,7 @@ to draw and play a stage for multiple dance styles, including Dance Dance Revolu
 The SSC file is an evolution of the old-fashioned SM files, allowing to include advanced timing data such as per-chart timing data,
 delays, warps, scroll speed, fake sections, and more.
 
-### Sections
+### SSC Sections
 
 Within SSC files, we can identify two separate sections:
 
@@ -161,21 +161,98 @@ will translate into array-shaped values in the resulting dictionary. Separator `
 }
 ```
 
-3. The `#NOTES` entry is shaped as an array of arrays, where the first layer consists of all bars, and the second layer has the notes for each bar. The possible note symbols in this entry, as defined in the grammar, are the following: `[01234567FMxXyY{}|nZzhLvs*BSEIa]`. I don't really know what these symbols stand for besides `0`, `1`, `2`, and `3`. The parse of this entry with the content of the previous toy example results in the following dictionary:
+3. The `#NOTES` entry is shaped as an array of arrays, where the first layer consists of all bars, and the second layer 
+has the notes for each bar. The possible note symbols in this entry, as defined in the grammar, are the following: `[01234567XxYyZzVHFMLK*BSEIa]`. 
+I don't really know what [these symbols](https://github.com/stepmania/stepmania/wiki/Note-Types) stand for besides `0`, `1`, `2`, and `3`. The parse of this entry with the content 
+of the previous toy example results in the following dictionary:
 ```javascript
 {
       header: {...},
       levels: [{
-        ...,
-        NOTES: [
-            [ '00000', '00000', '00000', '00000' ],
-            [ '00100', '00100', '00001', '0000M' ]
-        ],
-        SPECIALNOTES: true
+                ...,
+                NOTES: [
+                        [
+                            [ '0', '0', '0', '0', '0' ],
+                            [ '0', '0', '0', '0', '0' ],
+                            [ '0', '0', '0', '0', '0' ],
+                            [ '0', '0', '0', '0', '0' ]
+                        ],
+                        [
+                            [ '0', '0', '1', '0', '0' ],
+                            [ '0', '0', '1', '0', '0' ],
+                            [ '0', '0', '0', '0', '1' ],
+                            [ '0', '0', '0', '0', 'M' ]
+                        ]
+                ],
+                SPECIALNOTES: true
       }]
 }
 ```
-Note that a special entry in the dictionary `SPECIALNOTES` is created with a value of `true`. Its value is set to `true` if in the `#NOTES` section has been found a note symbol different from `0`, `1`, `2`, or `3`, otherwise it is set to `false`.
+This parser is also capable of parsing StepF2 special notes, which follow the syntax `{<type>|<attribute>|<fake>|<reserved>}`. 
+In such case, the content of the specific note is a dictionary with the following structure:
+```json
+{ 
+  type: ..., 
+  attribute: ..., 
+  fake: ..., 
+  reserved: ...
+}
+```
+There are other type of notes that take the shape of a string enclosed by braces, e.g. `{10a}`. These are parsed as an array with its
+contents, namely `[ '1', '0', 'a' ]`.
+To illustrate what is the parse when dealing with these kinds of notes, say that we have a `#NOTES` section with the following content:
+```
+#NOTES:
+{1|v|1|0}00000000{1|v|1|0}
+0{1|v|1|0}000000{1|v|1|0}0
+00{10a}0{10a}{10a}0{10a}00
+;
+```
+The resulting parse of this section will be as follows:
+```json
+[
+  [
+    { type: '1', attribute: 'v', fake: '1', reserved: '0' },
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    { type: '1', attribute: 'v', fake: '1', reserved: '0' }
+  ],
+  [
+    '0',
+    { type: '1', attribute: 'v', fake: '1', reserved: '0' },
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    '0',
+    { type: '1', attribute: 'v', fake: '1', reserved: '0' },
+    '0'
+  ],
+  [
+    '0',
+    '0',
+    [ '1', '0', 'a' ],
+    '0',
+    [ '1', '0', 'a' ],
+    [ '1', '0', 'a' ],
+    '0',
+    [ '1', '0', 'a' ],
+    '0',
+    '0'
+  ]
+]
+```
+
+Finally, note that a special entry in the dictionary `SPECIALNOTES` is created after parsing (not included in the SSC file). 
+Its value is a `Set` including all note symbols different than `0`, `1`, `2`, or `3`. When StepF2 notes are seen, the literal
+`StepF2` is added to the set.
 
 ### Error handling
 
@@ -183,7 +260,7 @@ A malformed SSC file will throw a parsing exception at parsing time. The excepti
 
 ## How to use the parser
 
-### On your browser
+### On the browser
 
 If you want to use it from your browser, just include the file `parsers/SSCParserClient.js` as a script in your HTML document.
 ```HTML
@@ -213,7 +290,7 @@ Make sure that you create the associated files under `parsers/` after any modifi
 
 ## Checking the correctness of your SSC files
 
-In this respository it is also bundled a small utility that will check that the SSC files in your STEPMANIA Song folder are correct. You can find it in `utils/checkSSCs.js`.
+In this repository also bundles a small utility that will check that the SSC files in your STEPMANIA Song folder are correct. You can find it in `utils/checkSSCs.js`.
 
 The command-line syntax is the following:
 ```bash
