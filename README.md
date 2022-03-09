@@ -190,7 +190,7 @@ of the previous toy example results in the following dictionary:
 ```
 This parser is also capable of parsing StepF2 special notes, which follow the syntax `{<type>|<attribute>|<fake>|<reserved>}`. 
 In such case, the content of the specific note is a dictionary with the following structure:
-```json
+```javascript
 { 
   type: ..., 
   attribute: ..., 
@@ -209,7 +209,7 @@ To illustrate what is the parse when dealing with these kinds of notes, say that
 ;
 ```
 The resulting parse of this section will be as follows:
-```json
+```javascript
 [
   [
     { type: '1', attribute: 'v', fake: '1', reserved: '0' },
