@@ -1,3 +1,8 @@
+## Installation
+Simply run on your favourite shell
+```shell
+$ npm install ssc-parser
+```
 ## PEGJS Javascript SSC Parser
 
 In this repository you will find all the software necessary to parse SSC files directly in your web application. It includes:
@@ -184,7 +189,7 @@ of the previous toy example results in the following dictionary:
                             [ '0', '0', '0', '0', 'M' ]
                         ]
                 ],
-                SPECIALNOTES: true
+                SPECIALNOTES: Set( ['M'] ) 
       }]
 }
 ```
@@ -256,11 +261,11 @@ Its value is a `Set` including all note symbols different than `0`, `1`, `2`, or
 
 ### Error handling
 
-A malformed SSC file will throw a parsing exception at parsing time. The exception details where the parsing error has occured. When a parsing error occurs, no parse is generated.
+A malformed SSC file will throw a parsing exception at parsing time. The exception details where the parsing error has occurred. When a parsing error occurs, no parse is generated.
 
 ## How to use the parser
 
-### On the browser
+### On the browser (Global)
 
 If you want to use it from your browser, just include the file `parsers/SSCParserClient.js` as a script in your HTML document.
 ```HTML
@@ -272,14 +277,14 @@ const sscContent = ... ;
 let parse = sscParser.parse(sscContent) ;
 ```
 
-### On Nodejs
+### On Nodejs (ES6 Module)
 
-Just import the file `parsers/SSCParser.js` and use the same procedure as described for the browsers.
+After installation, just import `parse` and `SyntaxError` from the package. To retrieve your parse, use the same procedure as described above.
 
 ```javascript
-const sscParser = require("./parser/SSCParser") ;
-const sscContent = ... ;
-let parse = sscParser.parse(sscContent) ;
+import { parseSSC, SyntaxError } from "ssc-parser"
+const sscContent = ... 
+let parse = parseSSC(sscContent) 
 ```
 
 ## Fine-tuning the grammar
@@ -298,7 +303,7 @@ checkSSCs.js <songsFolderPath>
 ```
 where `songsFolderPath` is the path containing all the songs with its associated SSC files. Another files can be present but they will be disregarded.
 
-To run this utility make sure to have the modules `glob` and `pegjs` installed in your system. You can use `npm` to do so.
+To run this utility make sure to have the modules `glob` and `pegjs` installed in your system. You can use `npm install` to do so.
 
 ## License
 

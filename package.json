@@ -1,0 +1,23 @@
+{
+  "name": "ssc-parser",
+  "version": "0.0.1",
+  "description": "A PEGJS-based parser for Stepmania SSC files",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "SSC",
+    "Stepmania",
+    "Javascript",
+    "parser",
+    "PEGJS"
+  ],
+  "author": "piulin <pepo_gonba@hotmail.com>",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "glob": "^8.0.3",
+    "pegjs": "^0.10.0"
+  }
+}

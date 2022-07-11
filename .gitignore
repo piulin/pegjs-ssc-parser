@@ -1,6 +1,4 @@
-package.json
 package-lock.json
-index.js
 node_modules/
 .idea/
 SSCs/
