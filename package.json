@@ -4,6 +4,10 @@
   "description": "A PEGJS-based parser for Stepmania SSC files",
   "main": "index.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/piulin/pegjs-ssc-parser"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
