@@ -1,4 +1,4 @@
-type ParsedAttribute = number | string | (number | string)[][];
+export type ParsedAttribute = number | string | (number | string)[][];
 
 export interface Meta {
   VERSION: ParsedAttribute;

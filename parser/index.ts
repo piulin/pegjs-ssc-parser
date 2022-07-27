@@ -17,11 +17,16 @@
 *
 */
 
-import { parse as _parseSSC, SyntaxError as _SyntaxError } from './SSCParser';
+import { parse as _parseSSC, SyntaxError as _SyntaxError } from "./SSCParser";
 import { ParsedSSC } from "./types";
 
-export function parseSSC(input: string, options?: Record<string, unknown>): ParsedSSC {
+export function parseSSC(
+  input: string,
+  options?: Record<string, unknown>
+): ParsedSSC {
   return _parseSSC(input) as ParsedSSC;
 }
 
 export const SyntaxError = _SyntaxError as unknown as Error;
+
+export { validateSSC } from "./validate";
