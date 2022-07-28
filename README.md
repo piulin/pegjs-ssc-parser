@@ -289,7 +289,7 @@ let parse = parseSSC(sscContent)
 
 ## Fine-tuning the grammar
 
-If you think that the parser does not fulfills your needs as is, you can tune the grammar that generates the parser for your specific application. The PEG grammar definition is available in the file `grammar/SSC.pegjs`.
+If you feel that the parser does not fulfill your needs as is, you can tune the grammar that generates the parser for your specific application. The PEG grammar definition is available in the file `grammar/SSC.pegjs`.
 
 Make sure that you create the associated files under `parsers/` after any modification. You can do it running the script `utils/exportSSCParser.sh` if you have `pegjs` installed in your system. You can learn more about the grammar syntax and `pegjs` [here](https://pegjs.org/).
 

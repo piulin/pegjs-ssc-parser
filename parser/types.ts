@@ -37,7 +37,7 @@ export interface Meta {
   BGCHANGES: ParsedAttribute;
 }
 
-type NotesWithoutMeaning =
+type UnknownNotes =
   | "5"
   | "6"
   | "7"
@@ -93,7 +93,7 @@ export enum KnownNotes {
   AutoKeysound = "K",
 }
 
-export type PossibleNotes = `${KnownNotes}` | NotesWithoutMeaning;
+export type PossibleNotes = `${KnownNotes}` | UnknownNotes;
 export enum StepF2NoteTypes {
   /**
    * Used instead of '1' when it's a CO-OP chart.
@@ -232,7 +232,7 @@ export interface Level {
   SPECIALNOTES: Set<string>;
 }
 
-export interface ParsedSSC {
+export interface Parse {
   header: Meta;
   levels: Level[];
 }

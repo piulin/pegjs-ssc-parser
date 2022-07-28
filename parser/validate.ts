@@ -1,4 +1,4 @@
-import { ParsedAttribute, ParsedSSC } from "./types";
+import { ParsedAttribute, Parse } from "./types";
 
 export enum SongTypes {
   Shortcut = "SHORTCUT",
@@ -151,7 +151,7 @@ export type ValidatedSSC = {
   backgroundChanges: ParsedAttribute;
 };
 
-export const validateSSC = (parsedSSC: ParsedSSC): ValidatedSSC | never => {
+export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
   const assertHeader = buildAssertProperty(parsedSSC.header);
 
   const selectableValue = assertHeader("SELECTABLE", assertString);
@@ -163,7 +163,7 @@ export const validateSSC = (parsedSSC: ParsedSSC): ValidatedSSC | never => {
   }
 
   const validated: ValidatedSSC = {
-    version: assertHeader("VERSION", assertNumber, true),
+    version: assertHeader("VERSION", assertNumber),
     title: assertHeader("TITLE", assertString),
     subtitle: assertHeader("SUBTITLE", assertString),
     artist: assertHeader("ARTIST", assertString),
@@ -178,7 +178,7 @@ export const validateSSC = (parsedSSC: ParsedSSC): ValidatedSSC | never => {
     previewVideo: assertHeader("PREVIEWVID", assertString),
     cdTitle: assertHeader("CDTITLE", assertString),
     music: assertHeader("MUSIC", assertString),
-    offset: assertHeader("OFFSET", assertNumber),
+    offset: assertHeader("OFFSET", assertNumber, true),
     sampleStart: assertHeader("SAMPLESTART", assertNumber),
     sampleLength: assertHeader("SAMPLELENGTH", assertNumber),
     selectable,
@@ -188,7 +188,8 @@ export const validateSSC = (parsedSSC: ParsedSSC): ValidatedSSC | never => {
     volume: assertHeader("VOLUME", assertNumber),
     BPMs: assertHeader(
       "BPMS",
-      assertTuplesArrayOfTypes([1, 2] as [number, number])
+      assertTuplesArrayOfTypes([1, 2] as [number, number]),
+      true
     ),
     timeSignatures: assertHeader(
       "TIMESIGNATURES",
@@ -196,7 +197,9 @@ export const validateSSC = (parsedSSC: ParsedSSC): ValidatedSSC | never => {
     ),
     tickCounts: assertHeader(
       "TICKCOUNTS",
-      assertTuplesArrayOfTypes([1, 2] as [number, number])
+      assertTuplesArrayOfTypes([1, 2] as [number, number]),
+      false,
+      [0,4]
     ),
     combos: assertHeader(
       "COMBOS",
@@ -204,15 +207,35 @@ export const validateSSC = (parsedSSC: ParsedSSC): ValidatedSSC | never => {
     ),
     speeds: assertHeader(
       "SPEEDS",
-      assertTuplesArrayOfTypes([1, 2, 3, 4] as [number, number, number, number])
+      assertTuplesArrayOfTypes([1, 2, 3, 4] as [number, number, number, number]),
+      false,
+      [[0,1,0,0]]
     ),
     scrolls: assertHeader(
       "SCROLLS",
-      assertTuplesArrayOfTypes([1, 2] as [number, number])
+      assertTuplesArrayOfTypes([1, 2] as [number, number]),
+      false,
+      [[0.0,1.0]]
     ),
-    delays: parsedSSC.header.DELAYS,
-    stops: parsedSSC.header.STOPS,
-    warps: parsedSSC.header.WARPS,
+
+    delays: assertHeader(
+      "DELAYS",
+      assertTuplesArrayOfTypes([1,2] as [number, number]),
+      false,
+      []
+    ),
+    stops: assertHeader(
+      "STOPS",
+      assertTuplesArrayOfTypes([1,2] as [number, number]),
+      false,
+      []
+    ),
+    warps: assertHeader(
+      "WARPS",
+      assertTuplesArrayOfTypes([1,2] as [number, number]),
+      false,
+      []
+    ),
     labels: parsedSSC.header.LABELS,
     lastSecondHint: parsedSSC.header.LASTSECONDHINT,
     backgroundChanges: parsedSSC.header.BGCHANGES,
@@ -254,14 +277,18 @@ const buildAssertProperty =
   <Key extends string & keyof T, AssertFunction extends (value: T[Key]) => any>(
     key: Key,
     assertFunction: AssertFunction,
-    required = false
+    required = false,
+    defaultValue: any = undefined
   ): GuardedType<AssertFunction> => {
     try {
       const isUndefined = !assertFunction(value[key]);
       if (required && isUndefined) {
         throw new Error(`Property ${key} is required.`);
-      }
 
+        // add possibility to set a default value when a property is not required
+      } else if (!required && isUndefined && defaultValue !== undefined) {
+           value[key] = defaultValue
+      }
       return value[key] as GuardedType<AssertFunction>;
     } catch (e) {
       throw new Error(

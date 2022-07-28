@@ -190,6 +190,8 @@ function peg$parse(input, options) {
               const val = text().trim() ;
               if ( isNumeric(val) ) {
                   return parseFloat(val) ;
+              } else if ( val.length == 0 ) {
+                  return undefined;
               }
               return val ;
           },

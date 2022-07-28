@@ -18,15 +18,14 @@
 */
 
 import { parse as _parseSSC, SyntaxError as _SyntaxError } from "./SSCParser";
-import { ParsedSSC } from "./types";
+import { Parse } from "./types";
 
 export function parseSSC(
   input: string,
   options?: Record<string, unknown>
-): ParsedSSC {
-  return _parseSSC(input) as ParsedSSC;
+): Parse {
+  return _parseSSC(input) as Parse;
 }
-
 export const SyntaxError = _SyntaxError as unknown as Error;
 
 export { validateSSC } from "./validate";
