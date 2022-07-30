@@ -1,4 +1,10 @@
-import { Parse, ParsedAttribute } from './types';
+import {
+    DoubleNotes,
+    HalfDoubleNotes,
+    Parse,
+    ParsedAttribute,
+    SingleNotes,
+} from './types';
 
 export enum SongTypes {
     Shortcut = 'SHORTCUT',
@@ -20,22 +26,44 @@ export type ValidatedLevel = {
     description: string;
     difficulty: string;
     meter: number;
-    radarValues: any[];
-    // CREDIT
-    // OFFSET
-    // BPMS
-    // STOPS
-    // DELAYS
-    // WARPS
-    // TIMESIGNATURES
-    // TICKCOUNTS
-    // COMBOS
-    // SPEEDS
-    // SCROLLS
-    // FAKES
-    // LABELS
-    // NOTES
-    // SPECIALNOTES
+    radarValues: number[][];
+    /**
+     * Step Artist
+     */
+    credit: string;
+    /**
+     * The song start offset. Overrides the song offset when set
+     */
+    offset: number;
+    /**
+     * A list of BPMs this song uses. The first value is when the BPM changes, and the second value is what to change it to.
+     */
+    BPMs: [Timestamp: number, BPMFromThisTimestamp: number][];
+    stops?: number[][];
+    delays?: ParsedAttribute;
+    warps: ParsedAttribute;
+    /**
+     * A list of time signatures, the first value being when the signature changes, the second and third being the signature (For example, 4=4 is 4/4 time). Note that this is not implemented in StepMania, the value does nothing at all and will not change the measure lines displayed in-game. However, ArrowVortex uses it so it may help you create charts.
+     */
+    timeSignatures: [
+        Timestamp: number,
+        FirstSignature: number,
+        SecondSignature: number
+    ][];
+    /**
+     * List of 'ticks' to apply during a hold note, which seems to be based on the BPM.
+     */
+    tickCounts: [number, number][];
+    combos: [number, number][];
+    /**
+     * When to apply, scroll speed multiplier, tween time, second or beat timing (either 0 or 1).
+     */
+    speeds: [number, number, number, number][];
+    scrolls: [number, number][];
+    fakes: number[][];
+    labels: [number, string][];
+    notes: SingleNotes | DoubleNotes | HalfDoubleNotes;
+    specialNotes: Set<string>;
 };
 
 export type ValidatedSSC = {
@@ -174,7 +202,7 @@ export type ValidatedSSC = {
      * TODO
      */
     delays?: ParsedAttribute;
-    stops: ParsedAttribute;
+    stops: number[][];
     warps: ParsedAttribute;
     labels: ParsedAttribute;
     lastSecondHint: ParsedAttribute;
@@ -285,7 +313,87 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
                 meter: assertLevel('METER', assertNumber),
                 radarValues: assertLevel(
                     'RADARVALUES',
-                    assertNDimensionalArray(2)
+                    assertNDimensionalArray<number[][]>(2)
+                ),
+                credit: assertLevel('CREDIT', assertString),
+                offset: assertLevel('OFFSET', assertNumber),
+                BPMs: assertLevel(
+                    'BPMS',
+                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                    true
+                ),
+                stops: assertLevel(
+                    'STOPS',
+                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                    false,
+                    []
+                ),
+                delays: assertLevel(
+                    'DELAYS',
+                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                    false,
+                    []
+                ),
+                warps: assertLevel(
+                    'WARPS',
+                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                    false,
+                    []
+                ),
+                timeSignatures: assertLevel(
+                    'TIMESIGNATURES',
+                    assertTuplesArrayOfTypes([1, 2, 3] as [
+                        number,
+                        number,
+                        number
+                    ])
+                ),
+                tickCounts: assertLevel(
+                    'TICKCOUNTS',
+                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                    false,
+                    [0, 4]
+                ),
+                combos: assertLevel(
+                    'COMBOS',
+                    assertTuplesArrayOfTypes([1, 2] as [number, number])
+                ),
+                speeds: assertLevel(
+                    'SPEEDS',
+                    assertTuplesArrayOfTypes([1, 2, 3, 4] as [
+                        number,
+                        number,
+                        number,
+                        number
+                    ]),
+                    false,
+                    [[0, 1, 0, 0]]
+                ),
+                scrolls: assertLevel(
+                    'SCROLLS',
+                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                    false,
+                    [[0.0, 1.0]]
+                ),
+                fakes: assertLevel(
+                    'FAKES',
+                    assertNDimensionalArray<number[][]>(2)
+                ),
+                labels: assertLevel(
+                    'LABELS',
+                    assertTuplesArrayOfTypes<[number, string]>([0, ''])
+                ),
+                notes: assertLevel(
+                    'NOTES',
+                    assertNDimensionalArray<
+                        SingleNotes | DoubleNotes | HalfDoubleNotes
+                    >(3)
+                ),
+                specialNotes: assertLevel(
+                    'SPECIALNOTES',
+                    (t) => t instanceof Set,
+                    false,
+                    new Set<string>()
                 ),
             };
 
@@ -380,18 +488,21 @@ const assertTuplesArrayOfTypes =
     };
 
 const assertNDimensionalArray =
-    (n = 1) =>
-    <T extends Array<string | number>>(t?: ParsedAttribute): t is T[] => {
+    <T extends Array<unknown>>(n = 1) =>
+    (t?: ParsedAttribute | unknown): t is T => {
         if (t === undefined) return false;
         if (n < 1) throw new Error(`n should be greater or equal than 1`);
 
         if (!Array.isArray(t)) return false;
 
-        const isArrayOfDepth = (array: any[], expectedDepth = n): boolean => {
+        const isArrayOfDepth = (
+            array: unknown[],
+            expectedDepth = n
+        ): boolean => {
             if (expectedDepth === 1) return Array.isArray(array);
 
             return array.every((item) =>
-                isArrayOfDepth(item, expectedDepth - 1)
+                isArrayOfDepth(item as unknown[], expectedDepth - 1)
             );
         };
 
