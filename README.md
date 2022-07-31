@@ -265,18 +265,6 @@ A malformed SSC file will throw a parsing exception at parsing time. The excepti
 
 ## How to use the parser
 
-### On the browser (Global)
-
-If you want to use it from your browser, just include the file `parsers/SSCParserClient.js` as a script in your HTML document.
-```HTML
-<script src="parser/SSCParserClient.js"></script>
-```
-A global object `sscParser` will be available. You can use its `parse(sscContent: str)` method to obtain the parse tree.
-```javascript
-const sscContent = ... ;
-let parse = sscParser.parse(sscContent) ;
-```
-
 ### On Nodejs (ES6 Module)
 
 After installation, just import `parse` and `SyntaxError` from the package. To retrieve your parse, use the same procedure as described above.
