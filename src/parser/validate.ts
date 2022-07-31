@@ -62,7 +62,10 @@ export type ValidatedLevel = {
     speeds: [number, number, number, number][];
     scrolls: [number, number][];
     fakes: number[][];
-    labels: [number, string][];
+    /**
+     * We do not have enough knowledge😶
+     */
+    labels: ParsedAttribute;
     notes: SingleNotes | DoubleNotes | HalfDoubleNotes;
     specialNotes: Set<string>;
 };
@@ -71,8 +74,7 @@ export type ValidatedSSC = {
     version: number;
     title: string;
     subtitle: string;
-    artist: string;
-
+    artist: string | string[];
     /**
      * The transliterated name of the song, meaning the name in pure English characters. For example, if the song's name is 冥, the tag would say "Mei", as that is the romanized name.
      */
@@ -180,13 +182,12 @@ export type ValidatedSSC = {
     ][];
 
     /**
-     * List of 'ticks' to apply during a hold note, which seems to be based on the BPM.
-     * TODO.
+     * Number of ticks (perfects if combos is 1) a beat is worth when holding a hold step.
      */
     tickCounts: [number, number][];
 
     /**
-     * No idea. TODO
+     * Number of perfects a tick is worth on holds
      */
     combos: [number, number][];
     /**
@@ -195,20 +196,35 @@ export type ValidatedSSC = {
     speeds: [number, number, number, number][];
 
     /**
-     * No idea. TODO
+     * Scrolling speed at beat. Does not affect BPM nor the spacing of the notes in the canvas (unlike speeds)
      */
     scrolls: [number, number][];
 
     /**
-     * TODO
+     * Add a delay (in seconds) at beat. This gimmick stops the sequencer. Delays come after the beat (PIU-style)
      */
-    delays?: ParsedAttribute;
-    stops: number[][];
-    warps: ParsedAttribute;
+    delays?: [number, number][];
+
+    /**
+     * Add a stop (in seconds) at beat. This gimmick stops the sequencer. Stops come before the beat (DDR-style)
+     */
+    stops: [number, number][];
+
+    /**
+     * Add a skip fragment at beat worth no-beats. Notes inside the warp are treated as fakes.
+     */
+    warps: [number, number][];
+
+    /**
+     * We don't know 😥
+     */
     labels: ParsedAttribute;
     lastSecondHint: ParsedAttribute;
     backgroundChanges: ParsedAttribute;
 
+    /**
+     * Each one of the NOTEDATA sections
+     */
     levels: ValidatedLevel[];
 };
 
@@ -223,23 +239,43 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
         selectable = 'YES';
     }
 
+    const castHeaderString = (
+        propertyKey: Parameters<typeof assertHeader>[0]
+    ) =>
+        assertHeader(propertyKey, assertString, {
+            required: false,
+            onTypeError: (val, originalError) => {
+                if (typeof val === 'number') {
+                    return val.toString();
+                }
+
+                throw originalError;
+            },
+        });
+
     const validated: ValidatedSSC = {
         version: assertHeader('VERSION', assertNumber),
-        title: assertHeader('TITLE', assertString),
-        subtitle: assertHeader('SUBTITLE', assertString),
-        artist: assertHeader('ARTIST', assertString),
-        titleTranslit: assertHeader('TITLETRANSLIT', assertString),
-        subtitleTranslit: assertHeader('SUBTITLETRANSLIT', assertString),
-        artistTranslit: assertHeader('ARTISTTRANSLIT', assertString),
-        genre: assertHeader('GENRE', assertString),
-        origin: assertHeader('ORIGIN', assertString),
-        credit: assertHeader('CREDIT', assertString),
+        title: castHeaderString('TITLE'),
+        subtitle: castHeaderString('SUBTITLE'),
+        artist: assertHeader(
+            'ARTIST',
+            assertUnion(assertString, assertNDimensionalArray<string[]>(1))
+        ),
+        titleTranslit: castHeaderString('TITLETRANSLIT'),
+        subtitleTranslit: castHeaderString('SUBTITLETRANSLIT'),
+        artistTranslit: castHeaderString('ARTISTTRANSLIT'),
+        genre: castHeaderString('GENRE'),
+        origin: castHeaderString('ORIGIN'),
+        credit: assertHeader(
+            'CREDIT',
+            assertUnion(assertString, assertNDimensionalArray<string[]>(1))
+        ),
         banner: assertHeader('BANNER', assertString),
         background: assertHeader('BACKGROUND', assertString),
         previewVideo: assertHeader('PREVIEWVID', assertString),
-        cdTitle: assertHeader('CDTITLE', assertString),
+        cdTitle: castHeaderString('CDTITLE'),
         music: assertHeader('MUSIC', assertString),
-        offset: assertHeader('OFFSET', assertNumber, true),
+        offset: assertHeader('OFFSET', assertNumber, { required: true }),
         sampleStart: assertHeader('SAMPLESTART', assertNumber),
         sampleLength: assertHeader('SAMPLELENGTH', assertNumber),
         selectable,
@@ -250,7 +286,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
         BPMs: assertHeader(
             'BPMS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            true
+            { required: true }
         ),
         timeSignatures: assertHeader(
             'TIMESIGNATURES',
@@ -259,8 +295,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
         tickCounts: assertHeader(
             'TICKCOUNTS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            false,
-            [0, 4]
+            { required: false, defaultValue: [[0, 4]] }
         ),
         combos: assertHeader(
             'COMBOS',
@@ -274,72 +309,86 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
                 number,
                 number
             ]),
-            false,
-            [[0, 1, 0, 0]]
+            { required: false, defaultValue: [[0, 4]] }
         ),
         scrolls: assertHeader(
             'SCROLLS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            false,
-            [[0.0, 1.0]]
+            { required: false, defaultValue: [[0.0, 1.0]] }
         ),
 
         delays: assertHeader(
             'DELAYS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            false,
-            []
+            { required: false, defaultValue: [] }
         ),
         stops: assertHeader(
             'STOPS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            false,
-            []
+            { required: false, defaultValue: [] }
         ),
         warps: assertHeader(
             'WARPS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            false,
-            []
+            { required: false, defaultValue: [] }
         ),
         labels: parsedSSC.header.LABELS,
         lastSecondHint: parsedSSC.header.LASTSECONDHINT,
         backgroundChanges: parsedSSC.header.BGCHANGES,
         levels: parsedSSC.levels.map<ValidatedLevel>((level) => {
             const assertLevel = buildAssertProperty(level);
+            const castLevelString = (
+                propertyKey: Exclude<
+                    Parameters<typeof assertLevel>[0],
+                    'NOTES' | 'SPECIALNOTES'
+                >
+            ) =>
+                assertLevel(propertyKey, assertString, {
+                    required: false,
+                    onTypeError: (val, originalError) => {
+                        if (typeof val === 'number') {
+                            return val.toString();
+                        }
+
+                        throw originalError;
+                    },
+                });
+
             const validated: ValidatedLevel = {
-                stepsType: assertLevel('STEPSTYPE', assertString) as StepsType,
-                description: assertLevel('DESCRIPTION', assertString),
-                difficulty: assertLevel('DIFFICULTY', assertString),
+                stepsType: assertLevel('STEPSTYPE', assertString, {
+                    required: true,
+                }) as StepsType,
+                description: castLevelString('DESCRIPTION'),
+                difficulty: castLevelString('DIFFICULTY'),
                 meter: assertLevel('METER', assertNumber),
                 radarValues: assertLevel(
                     'RADARVALUES',
                     assertNDimensionalArray<number[][]>(2)
                 ),
-                credit: assertLevel('CREDIT', assertString),
+                credit: assertLevel(
+                    'CREDIT',
+                    assertUnion(
+                        assertString,
+                        assertNDimensionalArray<string[]>(1)
+                    )
+                ),
                 offset: assertLevel('OFFSET', assertNumber),
+                // bpm not required here
                 BPMs: assertLevel(
                     'BPMS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
-                    true
+                    assertTuplesArrayOfTypes([1, 2] as [number, number])
                 ),
                 stops: assertLevel(
                     'STOPS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
-                    false,
-                    []
+                    assertTuplesArrayOfTypes([1, 2] as [number, number])
                 ),
                 delays: assertLevel(
                     'DELAYS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
-                    false,
-                    []
+                    assertTuplesArrayOfTypes([1, 2] as [number, number])
                 ),
                 warps: assertLevel(
                     'WARPS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
-                    false,
-                    []
+                    assertTuplesArrayOfTypes([1, 2] as [number, number])
                 ),
                 timeSignatures: assertLevel(
                     'TIMESIGNATURES',
@@ -351,9 +400,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
                 ),
                 tickCounts: assertLevel(
                     'TICKCOUNTS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
-                    false,
-                    [0, 4]
+                    assertTuplesArrayOfTypes([1, 2] as [number, number])
                 ),
                 combos: assertLevel(
                     'COMBOS',
@@ -366,24 +413,17 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
                         number,
                         number,
                         number
-                    ]),
-                    false,
-                    [[0, 1, 0, 0]]
+                    ])
                 ),
                 scrolls: assertLevel(
                     'SCROLLS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number]),
-                    false,
-                    [[0.0, 1.0]]
+                    assertTuplesArrayOfTypes([1, 2] as [number, number])
                 ),
                 fakes: assertLevel(
                     'FAKES',
                     assertNDimensionalArray<number[][]>(2)
                 ),
-                labels: assertLevel(
-                    'LABELS',
-                    assertTuplesArrayOfTypes<[number, string]>([0, ''])
-                ),
+                labels: level.LABELS as ParsedAttribute,
                 notes: assertLevel(
                     'NOTES',
                     assertNDimensionalArray<
@@ -392,9 +432,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
                 ),
                 specialNotes: assertLevel(
                     'SPECIALNOTES',
-                    (t) => t instanceof Set,
-                    false,
-                    new Set<string>()
+                    (t) => t instanceof Set
                 ),
             };
 
@@ -408,19 +446,19 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
 function assertString(t?: ParsedAttribute): t is string | never {
     if (t === undefined) return false;
 
-    if (typeof t !== 'string')
+    if (typeof t !== 'string') {
         throw new Error(
             `Expected string but got "${JSON.stringify(
                 t
             )}" of type ${typeof t} instead`
         );
+    }
 
     return true;
 }
 
 function assertNumber(t?: ParsedAttribute): t is number | never {
     if (t === undefined) return false;
-
     if (typeof t !== 'number')
         throw new Error(
             `Expected number but got "${JSON.stringify(
@@ -433,6 +471,11 @@ function assertNumber(t?: ParsedAttribute): t is number | never {
 
 type GuardedType<T> = T extends (x: any) => x is infer U ? U : never;
 
+type AssertOptions<T> = {
+    required?: boolean;
+    defaultValue?: T;
+    onTypeError?: (val: unknown, originalError: Error) => T | never;
+};
 const buildAssertProperty =
     <T>(value: T) =>
     <
@@ -441,8 +484,7 @@ const buildAssertProperty =
     >(
         key: Key,
         assertFunction: AssertFunction,
-        required = false,
-        defaultValue: any = undefined
+        { required, defaultValue, onTypeError }: AssertOptions<T[Key]> = {}
     ): GuardedType<AssertFunction> => {
         try {
             const isUndefined = !assertFunction(value[key]);
@@ -455,9 +497,32 @@ const buildAssertProperty =
             }
             return value[key] as GuardedType<AssertFunction>;
         } catch (e) {
+            if (onTypeError) {
+                return onTypeError(
+                    value[key],
+                    e as Error
+                ) as GuardedType<AssertFunction>;
+            }
             throw new Error(
-                `Error validating property "${key}. ${(e as Error).message}"`
+                `Error validating property "${key}". ${(e as Error).message}`
             );
+        }
+    };
+
+const assertUnion =
+    <Key extends keyof ParsedAttribute>(
+        ...assertFunctions: ((value?: ParsedAttribute) => boolean)[]
+    ) =>
+    (t?: ParsedAttribute) => {
+        for (const fn of assertFunctions) {
+            try {
+                const result = fn(t);
+                if (!result) continue;
+
+                return result;
+            } catch (e) {
+                if (fn === assertFunctions[assertFunctions.length - 1]) throw e;
+            }
         }
     };
 
