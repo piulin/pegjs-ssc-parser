@@ -79,16 +79,16 @@ item_separator
     = _ ("="/":") _
 
 valid_char
-    = [^;:=,\n/]
+    = "\\," / "\\;" / "\\:" / "\\=" / [^;:=,\n/]
 string
     = valid_char* (!"//" "/" valid_char*)* {
         const val = text().trim() ;
         if ( isNumeric(val) ) {
             return parseFloat(val) ;
         } else if ( val.length == 0 ) {
-            return undefined;
+            return null;
         }
-        return val ;
+        return val.replace("\\","") ;
     }
 
 key

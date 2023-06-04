@@ -24,14 +24,14 @@ export enum StepsType {
 
 export type ValidatedLevel = {
     stepsType: StepsType;
-    description: string;
-    difficulty: string;
+    description?: string;
+    difficulty?: string;
     meter: number;
-    radarValues: number[][];
+    radarValues?: number[][];
     /**
      * Step Artist
      */
-    credit: string;
+    credit?: string;
     /**
      * The song start offset. Overrides the song offset when set
      */
@@ -39,91 +39,95 @@ export type ValidatedLevel = {
     /**
      * A list of BPMs this song uses. The first value is when the BPM changes, and the second value is what to change it to.
      */
-    BPMs: [Timestamp: number, BPMFromThisTimestamp: number][];
-    stops?: number[][];
-    delays?: ParsedAttribute;
-    warps: ParsedAttribute;
+    BPMs: [beat: number, bpm: number][];
+    stops: [beat: number, stop: number][];
+    delays: [beat: number, delay: number][];
+    warps: [beat: number, warp: number][];
     /**
      * A list of time signatures, the first value being when the signature changes, the second and third being the signature (For example, 4=4 is 4/4 time). Note that this is not implemented in StepMania, the value does nothing at all and will not change the measure lines displayed in-game. However, ArrowVortex uses it so it may help you create charts.
      */
     timeSignatures: [
-        Timestamp: number,
-        FirstSignature: number,
-        SecondSignature: number
+        beat: number,
+        firstSignature: number,
+        secondSignature: number
     ][];
     /**
      * List of 'ticks' to apply during a hold note, which seems to be based on the BPM.
      */
-    tickCounts: [number, number][];
-    combos: [number, number][];
+    tickCounts: [beat: number, tickCount: number][];
+    combos: [beat: number, combo: number][];
     /**
      * When to apply, scroll speed multiplier, tween time, second or beat timing (either 0 or 1).
      */
-    speeds: [number, number, number, number][];
-    scrolls: [number, number][];
-    fakes: number[][];
+    speeds: [
+        beat: number,
+        speed: number,
+        spanTime: number,
+        spanTimeType: number
+    ][];
+    scrolls: [beat: number, scroll: number][];
+    fakes?: [beat: number, value: number][];
     /**
      * We do not have enough knowledge😶
      */
-    labels: ParsedAttribute;
-    notes: SingleNotes | DoubleNotes | HalfDoubleNotes;
-    specialNotes: Set<string>;
+    labels?: ParsedAttribute;
+    notes?: SingleNotes | DoubleNotes | HalfDoubleNotes;
+    specialNotes?: Set<string>;
 };
-
-export type ValidatedSSC = {
-    version: number;
+export type ValidatedHeader = {
+    version?: number;
     title: string;
-    subtitle: string;
-    artist: string | string[];
+    subtitle?: string;
+    artist?: string;
     /**
      * The transliterated name of the song, meaning the name in pure English characters. For example, if the song's name is 冥, the tag would say "Mei", as that is the romanized name.
      */
-    titleTranslit: string;
+    titleTranslit?: string;
     /**
      * See `titleTranslit`
      */
-    subtitleTranslit: string;
+    subtitleTranslit?: string;
     /**
      * See titleTranslit
      */
-    artistTranslit: string;
+    artistTranslit?: string;
 
     /**
      * The genre of the song. Used for genre sorts in StepMania, but has special meanings in StepF2.
      * In StepF2, you can use FULLSONG, J-MUSIC, K-POP, etc change where the song is sorted in the group (PIU sorts songs by genre within groups).
      */
-    genre: string;
+    genre?: string;
 
     /**
      * This tag is never used for anything, it is essentially a free tag to put anything you want. The original intent was to specify what game the song came from, but virtually no themes use it.
      * In SM-AMW this is used for what year the song came from, allowing you to sort by year.
      */
-    origin: string;
+    origin?: string;
 
     /**
      * The stepmaker credit, but since charts can have their own credits this tag is redundant and essentially depreciated.
      */
-    credit: string;
+    credit?: string;
 
     /**
      * The relative path to the banner
      */
-    banner: string;
+    banner?: string;
 
     /**
      * The relative path to the background.
      */
-    background: string;
+    background?: string;
 
     /**
      * The relative path to the preview video. Preview videos are used in pump themes and displayed while hovering over a song.
      */
-    previewVideo: string;
+    previewVideo?: string;
 
     /**
      * The relative path to the "CD Title", which is a spinning graphic that some themes display on top of the banner/jacket while hovering over the song. Most themes no longer use this.
      */
-    cdTitle: string;
+    cdTitle?: string;
 
     /**
      * The relative path to the song's music file.
@@ -138,34 +142,34 @@ export type ValidatedSSC = {
     /**
      * The time in seconds to start playing the song's sample while previewing it in the music select.
      */
-    sampleStart: number;
+    sampleStart?: number;
 
     /**
      * The length in seconds to play the sample.
      */
-    sampleLength: number;
+    sampleLength?: number;
 
     /**
      * If this song is available in the music select while the unlock system is enabled. If the unlock system is disabled, this song is always selectable.
      * In StepMania, the only valid values are "YES" and "NO", and any other value will default to "YES".
      * In StepAMW, you may use "YES", "NO", and "EASY". "EASY" means this song is only available if GAMESTATE:SetBasicMode() was called before entering the music select and the unlock system is enabled.
      */
-    selectable: 'YES' | 'NO' | 'EASY';
+    selectable?: 'YES' | 'NO' | 'EASY';
 
     /**
      * The type of the song. See the enum for possible values.
      */
-    songType: SongTypes;
+    songType?: SongTypes;
 
     /**
      * Folder of the song
      */
-    songCategory: string;
+    songCategory?: string;
 
     /**
      * Volume of the song. From 0 to an arbitrary number.
      */
-    volume: number;
+    volume?: number;
 
     /**
      * A list of BPMs this song uses. However, individual charts can have their own BPMs. The first value is when the BPM changes, and the second value is what to change it to.
@@ -203,7 +207,7 @@ export type ValidatedSSC = {
     /**
      * Add a delay (in seconds) at beat. This gimmick stops the sequencer. Delays come after the beat (PIU-style)
      */
-    delays?: [number, number][];
+    delays: [number, number][];
 
     /**
      * Add a stop (in seconds) at beat. This gimmick stops the sequencer. Stops come before the beat (DDR-style)
@@ -218,10 +222,12 @@ export type ValidatedSSC = {
     /**
      * We don't know 😥
      */
-    labels: ParsedAttribute;
-    lastSecondHint: ParsedAttribute;
-    backgroundChanges: ParsedAttribute;
-
+    labels?: ParsedAttribute;
+    lastSecondHint?: ParsedAttribute;
+    backgroundChanges?: ParsedAttribute;
+};
+export type ValidatedSSC = {
+    header: ValidatedHeader;
     /**
      * Each one of the NOTEDATA sections
      */
@@ -232,7 +238,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
     const assertHeader = buildAssertProperty(parsedSSC.header);
 
     const selectableValue = assertHeader('SELECTABLE', assertString);
-    let selectable: ValidatedSSC['selectable'];
+    let selectable: ValidatedSSC['header']['selectable'];
     if ((['YES', 'NO', 'EASY'] as const).includes(selectableValue as any)) {
         selectable = selectableValue as any;
     } else {
@@ -240,10 +246,11 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
     }
 
     const castHeaderString = (
-        propertyKey: Parameters<typeof assertHeader>[0]
+        propertyKey: Parameters<typeof assertHeader>[0],
+        { required = false } = {}
     ) =>
         assertHeader(propertyKey, assertString, {
-            required: false,
+            required: required,
             onTypeError: (val, originalError) => {
                 if (typeof val === 'number') {
                     return val.toString();
@@ -253,9 +260,9 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
             },
         });
 
-    const validated: ValidatedSSC = {
+    const validatedHeader: ValidatedHeader = {
         version: assertHeader('VERSION', assertNumber),
-        title: castHeaderString('TITLE'),
+        title: castHeaderString('TITLE', { required: true }),
         subtitle: castHeaderString('SUBTITLE'),
         artist: assertHeader(
             'ARTIST',
@@ -274,7 +281,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
         background: assertHeader('BACKGROUND', assertString),
         previewVideo: assertHeader('PREVIEWVID', assertString),
         cdTitle: castHeaderString('CDTITLE'),
-        music: assertHeader('MUSIC', assertString),
+        music: assertHeader('MUSIC', assertString, { required: true }),
         offset: assertHeader('OFFSET', assertNumber, { required: true }),
         sampleStart: assertHeader('SAMPLESTART', assertNumber),
         sampleLength: assertHeader('SAMPLELENGTH', assertNumber),
@@ -290,16 +297,18 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
         ),
         timeSignatures: assertHeader(
             'TIMESIGNATURES',
-            assertTuplesArrayOfTypes([1, 2, 3] as [number, number, number])
+            assertTuplesArrayOfTypes([1, 2, 3] as [number, number, number]),
+            { required: true }
         ),
         tickCounts: assertHeader(
             'TICKCOUNTS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            { required: false, defaultValue: [[0, 4]] }
+            { required: false, defaultValue: { default: [[0, 4]] } }
         ),
         combos: assertHeader(
             'COMBOS',
-            assertTuplesArrayOfTypes([1, 2] as [number, number])
+            assertTuplesArrayOfTypes([1, 2] as [number, number]),
+            { required: false, defaultValue: { default: [[0, 1]] } }
         ),
         speeds: assertHeader(
             'SPEEDS',
@@ -309,142 +318,189 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
                 number,
                 number
             ]),
-            { required: false, defaultValue: [[0, 4]] }
+            { required: false, defaultValue: { default: [[0, 1, 0, 0]] } }
         ),
         scrolls: assertHeader(
             'SCROLLS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            { required: false, defaultValue: [[0.0, 1.0]] }
+            { required: false, defaultValue: { default: [[0.0, 1.0]] } }
         ),
 
         delays: assertHeader(
             'DELAYS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            { required: false, defaultValue: [] }
+            { required: false, defaultValue: { default: [] } }
         ),
         stops: assertHeader(
             'STOPS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            { required: false, defaultValue: [] }
+            { required: false, defaultValue: { default: [] } }
         ),
         warps: assertHeader(
             'WARPS',
             assertTuplesArrayOfTypes([1, 2] as [number, number]),
-            { required: false, defaultValue: [] }
+            { required: false, defaultValue: { default: [] } }
         ),
         labels: parsedSSC.header.LABELS,
         lastSecondHint: parsedSSC.header.LASTSECONDHINT,
         backgroundChanges: parsedSSC.header.BGCHANGES,
-        levels: parsedSSC.levels.map<ValidatedLevel>((level) => {
-            const assertLevel = buildAssertProperty(level);
-            const castLevelString = (
-                propertyKey: Exclude<
-                    Parameters<typeof assertLevel>[0],
-                    'NOTES' | 'SPECIALNOTES'
-                >
-            ) =>
-                assertLevel(propertyKey, assertString, {
-                    required: false,
-                    onTypeError: (val, originalError) => {
-                        if (typeof val === 'number') {
-                            return val.toString();
-                        }
+    };
 
-                        throw originalError;
+    const validatedLevels = parsedSSC.levels.map<ValidatedLevel>((level) => {
+        const assertLevel = buildAssertProperty(level);
+        const castLevelString = (
+            propertyKey: Exclude<
+                Parameters<typeof assertLevel>[0],
+                'NOTES' | 'SPECIALNOTES'
+            >,
+            { required = false } = {}
+        ) => {
+            return assertLevel(propertyKey, assertString, {
+                required: false,
+                onTypeError: (val, originalError) => {
+                    if (typeof val === 'number') {
+                        return val.toString();
+                    }
+
+                    throw originalError;
+                },
+            });
+        };
+
+        const validated: ValidatedLevel = {
+            stepsType: assertLevel('STEPSTYPE', assertString, {
+                required: true,
+            }) as StepsType,
+            description: castLevelString('DESCRIPTION'),
+            difficulty: castLevelString('DIFFICULTY'),
+            meter: assertLevel('METER', assertNumber, { required: true }),
+            radarValues: assertLevel(
+                'RADARVALUES',
+                assertNDimensionalArray<number[][]>(2)
+            ),
+            credit: assertLevel(
+                'CREDIT',
+                assertUnion(assertString, assertNDimensionalArray<string[]>(1))
+            ),
+            offset: assertLevel('OFFSET', assertNumber, {
+                defaultValue: { defaultUndefined: validatedHeader.offset },
+            }),
+            // bpm not required here
+            BPMs: assertLevel(
+                'BPMS',
+                assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                {
+                    defaultValue: { default: validatedHeader.BPMs },
+                }
+            ),
+            stops: assertLevel(
+                'STOPS',
+                assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                {
+                    defaultValue: {
+                        defaultUndefined: validatedHeader.stops,
+                        defaultNull: [],
                     },
-                });
+                }
+            ),
+            delays: assertLevel(
+                'DELAYS',
+                assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                {
+                    defaultValue: {
+                        defaultUndefined: validatedHeader.delays,
+                        defaultNull: [],
+                    },
+                }
+            ),
+            warps: assertLevel(
+                'WARPS',
+                assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                {
+                    defaultValue: {
+                        defaultUndefined: validatedHeader.warps,
+                        defaultNull: [],
+                    },
+                }
+            ),
+            //-
+            timeSignatures: assertLevel(
+                'TIMESIGNATURES',
+                assertTuplesArrayOfTypes([1, 2, 3] as [number, number, number]),
+                {
+                    defaultValue: {
+                        default: validatedHeader.timeSignatures,
+                    },
+                }
+            ),
+            tickCounts: assertLevel(
+                'TICKCOUNTS',
+                assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                {
+                    defaultValue: {
+                        default: validatedHeader.tickCounts,
+                    },
+                }
+            ),
+            combos: assertLevel(
+                'COMBOS',
+                assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                {
+                    defaultValue: {
+                        default: validatedHeader.combos,
+                    },
+                }
+            ),
+            speeds: assertLevel(
+                'SPEEDS',
+                assertTuplesArrayOfTypes([1, 2, 3, 4] as [
+                    number,
+                    number,
+                    number,
+                    number
+                ]),
+                {
+                    defaultValue: {
+                        default: validatedHeader.speeds,
+                    },
+                }
+            ),
+            scrolls: assertLevel(
+                'SCROLLS',
+                assertTuplesArrayOfTypes([1, 2] as [number, number]),
+                {
+                    defaultValue: {
+                        default: validatedHeader.scrolls,
+                    },
+                }
+            ),
+            fakes: assertLevel(
+                'FAKES',
+                assertTuplesArrayOfTypes([1, 2] as [number, number])
+            ),
+            labels: level.LABELS as ParsedAttribute,
+            notes: assertLevel(
+                'NOTES',
+                assertNDimensionalArray<
+                    SingleNotes | DoubleNotes | HalfDoubleNotes
+                >(3)
+            ),
+            specialNotes: assertLevel('SPECIALNOTES', (t) => t instanceof Set),
+        };
 
-            const validated: ValidatedLevel = {
-                stepsType: assertLevel('STEPSTYPE', assertString, {
-                    required: true,
-                }) as StepsType,
-                description: castLevelString('DESCRIPTION'),
-                difficulty: castLevelString('DIFFICULTY'),
-                meter: assertLevel('METER', assertNumber),
-                radarValues: assertLevel(
-                    'RADARVALUES',
-                    assertNDimensionalArray<number[][]>(2)
-                ),
-                credit: assertLevel(
-                    'CREDIT',
-                    assertUnion(
-                        assertString,
-                        assertNDimensionalArray<string[]>(1)
-                    )
-                ),
-                offset: assertLevel('OFFSET', assertNumber),
-                // bpm not required here
-                BPMs: assertLevel(
-                    'BPMS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number])
-                ),
-                stops: assertLevel(
-                    'STOPS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number])
-                ),
-                delays: assertLevel(
-                    'DELAYS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number])
-                ),
-                warps: assertLevel(
-                    'WARPS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number])
-                ),
-                timeSignatures: assertLevel(
-                    'TIMESIGNATURES',
-                    assertTuplesArrayOfTypes([1, 2, 3] as [
-                        number,
-                        number,
-                        number
-                    ])
-                ),
-                tickCounts: assertLevel(
-                    'TICKCOUNTS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number])
-                ),
-                combos: assertLevel(
-                    'COMBOS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number])
-                ),
-                speeds: assertLevel(
-                    'SPEEDS',
-                    assertTuplesArrayOfTypes([1, 2, 3, 4] as [
-                        number,
-                        number,
-                        number,
-                        number
-                    ])
-                ),
-                scrolls: assertLevel(
-                    'SCROLLS',
-                    assertTuplesArrayOfTypes([1, 2] as [number, number])
-                ),
-                fakes: assertLevel(
-                    'FAKES',
-                    assertNDimensionalArray<number[][]>(2)
-                ),
-                labels: level.LABELS as ParsedAttribute,
-                notes: assertLevel(
-                    'NOTES',
-                    assertNDimensionalArray<
-                        SingleNotes | DoubleNotes | HalfDoubleNotes
-                    >(3)
-                ),
-                specialNotes: assertLevel(
-                    'SPECIALNOTES',
-                    (t) => t instanceof Set
-                ),
-            };
+        return validated;
+    });
 
-            return validated;
-        }),
+    const validated: ValidatedSSC = {
+        header: validatedHeader,
+        levels: validatedLevels,
     };
 
     return validated;
 };
 
 function assertString(t?: ParsedAttribute): t is string | never {
-    if (t === undefined) return false;
+    if (t === undefined || t === null) return false;
 
     if (typeof t !== 'string') {
         throw new Error(
@@ -458,7 +514,7 @@ function assertString(t?: ParsedAttribute): t is string | never {
 }
 
 function assertNumber(t?: ParsedAttribute): t is number | never {
-    if (t === undefined) return false;
+    if (t === undefined || t === null) return false;
     if (typeof t !== 'number')
         throw new Error(
             `Expected number but got "${JSON.stringify(
@@ -473,9 +529,10 @@ type GuardedType<T> = T extends (x: any) => x is infer U ? U : never;
 
 type AssertOptions<T> = {
     required?: boolean;
-    defaultValue?: T;
+    defaultValue?: { default?: T; defaultNull?: T; defaultUndefined?: T };
     onTypeError?: (val: unknown, originalError: Error) => T | never;
 };
+
 const buildAssertProperty =
     <T>(value: T) =>
     <
@@ -487,13 +544,27 @@ const buildAssertProperty =
         { required, defaultValue, onTypeError }: AssertOptions<T[Key]> = {}
     ): GuardedType<AssertFunction> => {
         try {
-            const isUndefined = !assertFunction(value[key]);
-            if (required && isUndefined) {
+            assertFunction(value[key]);
+            // An attribute is `null` when it its key exists in the SSC but its value is empty
+            const isNull = value[key] === null;
+            // An attribute is `undefined` when it its key does not exist in the SSC
+            const isUndefined = value[key] === undefined;
+            const isUndefinedOrNull = isNull || isUndefined;
+            if (required && isUndefinedOrNull) {
                 throw new Error(`Property ${key} is required.`);
 
                 // add possibility to set a default value when a property is not required
-            } else if (!required && isUndefined && defaultValue !== undefined) {
-                value[key] = defaultValue;
+            } else if (!required && isUndefinedOrNull) {
+                if (defaultValue?.default) {
+                    value[key] = defaultValue.default;
+                } else {
+                    if (defaultValue?.defaultNull && isNull) {
+                        value[key] = defaultValue.defaultNull;
+                    }
+                    if (defaultValue?.defaultUndefined && isUndefined) {
+                        value[key] = defaultValue.defaultUndefined;
+                    }
+                }
             }
             return value[key] as GuardedType<AssertFunction>;
         } catch (e) {
@@ -536,17 +607,15 @@ const assertTuplesArrayOfTypes =
             );
 
         const misMatchIndex = references.findIndex((referenceType, index) =>
-            t.some((tuple) => typeof referenceType !== typeof tuple[index])
+            t?.some((tuple) => typeof referenceType !== typeof tuple[index])
         );
         if (misMatchIndex !== -1) {
             throw new Error(
                 `Expected all elements to be of types [${references
                     .map((c) => typeof c)
-                    .join(', ')}], but got [${t[misMatchIndex]
-                    .map((c) => typeof c)
-                    .join(', ')}] (Values = ${JSON.stringify(
-                    t[misMatchIndex]
-                )})`
+                    .join(', ')}], but got [${
+                    t ? [misMatchIndex] : [].map((c) => typeof c).join(', ')
+                }] (Values = ${JSON.stringify(t ? [misMatchIndex] : 'null')})`
             );
         }
 
