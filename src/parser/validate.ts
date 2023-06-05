@@ -264,19 +264,13 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
         version: assertHeader('VERSION', assertNumber),
         title: castHeaderString('TITLE', { required: true }),
         subtitle: castHeaderString('SUBTITLE'),
-        artist: assertHeader(
-            'ARTIST',
-            assertUnion(assertString, assertNDimensionalArray<string[]>(1))
-        ),
+        artist: castHeaderString('ARTIST'),
         titleTranslit: castHeaderString('TITLETRANSLIT'),
         subtitleTranslit: castHeaderString('SUBTITLETRANSLIT'),
         artistTranslit: castHeaderString('ARTISTTRANSLIT'),
         genre: castHeaderString('GENRE'),
         origin: castHeaderString('ORIGIN'),
-        credit: assertHeader(
-            'CREDIT',
-            assertUnion(assertString, assertNDimensionalArray<string[]>(1))
-        ),
+        credit: castHeaderString('CREDIT'),
         banner: assertHeader('BANNER', assertString),
         background: assertHeader('BACKGROUND', assertString),
         previewVideo: assertHeader('PREVIEWVID', assertString),
@@ -378,10 +372,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
                 'RADARVALUES',
                 assertNDimensionalArray<number[][]>(2)
             ),
-            credit: assertLevel(
-                'CREDIT',
-                assertUnion(assertString, assertNDimensionalArray<string[]>(1))
-            ),
+            credit: castLevelString('CREDIT'),
             offset: assertLevel('OFFSET', assertNumber, {
                 defaultValue: { defaultUndefined: validatedHeader.offset },
             }),
