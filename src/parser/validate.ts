@@ -374,7 +374,9 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
             ),
             credit: castLevelString('CREDIT'),
             offset: assertLevel('OFFSET', assertNumber, {
-                defaultValue: { defaultUndefined: validatedHeader.offset },
+                defaultValue: {
+                    defaultUndefined: validatedHeader.offset,
+                },
             }),
             // bpm not required here
             BPMs: assertLevel(
@@ -546,13 +548,24 @@ const buildAssertProperty =
 
                 // add possibility to set a default value when a property is not required
             } else if (!required && isUndefinedOrNull) {
-                if (defaultValue?.default) {
+                if (
+                    defaultValue?.default !== null &&
+                    defaultValue?.default !== undefined
+                ) {
                     value[key] = defaultValue.default;
                 } else {
-                    if (defaultValue?.defaultNull && isNull) {
+                    if (
+                        defaultValue?.defaultNull !== null &&
+                        defaultValue?.defaultNull !== undefined &&
+                        isNull
+                    ) {
                         value[key] = defaultValue.defaultNull;
                     }
-                    if (defaultValue?.defaultUndefined && isUndefined) {
+                    if (
+                        defaultValue?.defaultUndefined !== null &&
+                        defaultValue?.defaultUndefined !== undefined &&
+                        isUndefined
+                    ) {
                         value[key] = defaultValue.defaultUndefined;
                     }
                 }
