@@ -1829,7 +1829,21 @@
                         const note = notes[i];
                         if ( note !== '0' && note !== '1' && note !== '2' && note !== '3' ) {
                             if ( typeof note === 'object' ) {
-                                specialNotes.add('StepF2') ;
+                                // check if note is dictionary
+                                if( Object.keys(note).length > 0 ) {
+                                    // iterate keys and values
+                                    if (note.attribute === 'v') {
+                                        specialNotes.add('V') ;
+                                    } else if (note.attribute === 's') {
+                                        specialNotes.add('S') ;
+                                    } else if (note.attribute === 'h') {
+                                        specialNotes.add('H') ;
+                                    }
+                                    if (note.fake === '1') {
+                                        specialNotes.add('F') ;
+                                    }
+
+                                }
                             } else {
                                 specialNotes.add(note) ;
                             }
