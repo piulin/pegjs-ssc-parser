@@ -1941,7 +1941,7 @@ function peg$parse(input, options) {
     if (s1 !== peg$FAILED) {
       s2 = peg$parsekey_value_separator();
       if (s2 !== peg$FAILED) {
-        s3 = peg$parsestring();
+        s3 = peg$parsecommaed_string();
         if (s3 !== peg$FAILED) {
           s4 = peg$parsekey_value_separator();
           if (s4 !== peg$FAILED) {

@@ -218,7 +218,7 @@ notes_entry
     }
 
 notes_meta
-    = style:string key_value_separator stepartist:string key_value_separator difficulty:string key_value_separator meter:string key_value_separator radar:commaed_string key_value_separator {
+    = style:string key_value_separator stepartist:commaed_string key_value_separator difficulty:string key_value_separator meter:string key_value_separator radar:commaed_string key_value_separator {
         return {
             STEPSTYPE: style,
             CREDIT: stepartist,
