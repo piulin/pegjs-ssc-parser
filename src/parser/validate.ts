@@ -492,7 +492,7 @@ export const validateSSC = (parsedSSC: Parse): ValidatedSSC | never => {
     return validated;
 };
 
-function assertString(t?: ParsedAttribute): t is string | never {
+export function assertString(t?: ParsedAttribute): t is string | never {
     if (t === undefined || t === null) return false;
 
     if (typeof t !== 'string') {
@@ -506,7 +506,7 @@ function assertString(t?: ParsedAttribute): t is string | never {
     return true;
 }
 
-function assertNumber(t?: ParsedAttribute): t is number | never {
+export function assertNumber(t?: ParsedAttribute): t is number | never {
     if (t === undefined || t === null) return false;
     if (typeof t !== 'number')
         throw new Error(
@@ -526,7 +526,7 @@ type AssertOptions<T> = {
     onTypeError?: (val: unknown, originalError: Error) => T | never;
 };
 
-const buildAssertProperty =
+export const buildAssertProperty =
     <T>(value: T) =>
     <
         Key extends string & keyof T,
@@ -601,7 +601,7 @@ const assertUnion =
         }
     };
 
-const assertTuplesArrayOfTypes =
+export const assertTuplesArrayOfTypes =
     <T extends Array<string | number>>(references: T) =>
     (t?: ParsedAttribute): t is T[] | never => {
         if (t === undefined) return false;
@@ -626,7 +626,7 @@ const assertTuplesArrayOfTypes =
         return true;
     };
 
-const assertNDimensionalArray =
+export const assertNDimensionalArray =
     <T extends Array<unknown>>(n = 1) =>
     (t?: ParsedAttribute | unknown): t is T => {
         if (t === undefined) return false;
