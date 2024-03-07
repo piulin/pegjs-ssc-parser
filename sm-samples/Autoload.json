@@ -12,7 +12,7 @@
     "background": "Autoload-bg.png",
     "cdTitle": null,
     "music": "Autoload.ogg",
-    "offset": -0.024,
+    "offset": 0,
     "sampleStart": 67.533,
     "sampleLength": 15,
     "selectable": "YES",
@@ -81,7 +81,7 @@
       "difficulty": "Hard",
       "meter": 8,
       "credit": "D. D'Amato",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -4272,7 +4272,7 @@
       "difficulty": "Challenge",
       "meter": 9,
       "credit": "D. D'Amato",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -9351,7 +9351,7 @@
       "difficulty": "Medium",
       "meter": 6,
       "credit": "D. D'Amato",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -11814,7 +11814,7 @@
       "difficulty": "Easy",
       "meter": 2,
       "credit": "D. D'Amato",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -13341,7 +13341,7 @@
       "difficulty": "Easy",
       "meter": 4,
       "credit": "M. Emirzian",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -15780,7 +15780,7 @@
       "difficulty": "Medium",
       "meter": 6,
       "credit": "M. Emirzian",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -19539,7 +19539,7 @@
       "difficulty": "Hard",
       "meter": 7,
       "credit": "M. Emirzian",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -25578,7 +25578,7 @@
       "difficulty": "Challenge",
       "meter": 9,
       "credit": "M. Emirzian",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -32457,7 +32457,7 @@
       "difficulty": "Beginner",
       "meter": 1,
       "credit": "J. Frederick",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,
@@ -33984,7 +33984,7 @@
       "difficulty": "Beginner",
       "meter": 1,
       "credit": "J. Frederick",
-      "offset": -0.024,
+      "offset": 0,
       "BPMs": [
         [
           0,

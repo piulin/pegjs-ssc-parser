@@ -9,9 +9,9 @@ describe('parse', () => {
                 'utf-8'
             );
             const parsedSM = parseSM(smContent);
-            console.log(parsedSM);
 
-            const validatedSSC = validateSM(parsedSM);
+            const validatedSSC = validateSM(parsedSM, false);
+            console.log(validatedSSC);
 
             // write into disk validatedSSC as json file
             await fs.writeFile(

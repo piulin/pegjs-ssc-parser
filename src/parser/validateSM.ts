@@ -18,7 +18,10 @@ import {
     buildAssertProperty,
 } from './validate';
 
-export const validateSM = (parsedSSC: Parse): ValidatedSSC | never => {
+export const validateSM = (
+    parsedSSC: Parse,
+    requireOffset = true
+): ValidatedSSC | never => {
     const assertHeader = buildAssertProperty(parsedSSC.header);
 
     const selectableValue = assertHeader('SELECTABLE', assertString);
@@ -60,7 +63,13 @@ export const validateSM = (parsedSSC: Parse): ValidatedSSC | never => {
         previewVideo: assertHeader('PREVIEWVID', assertString),
         cdTitle: castHeaderString('CDTITLE'),
         music: assertHeader('MUSIC', assertString, { required: true }),
-        offset: assertHeader('OFFSET', assertNumber, { required: true }),
+        offset: assertHeader(
+            'OFFSET',
+            assertNumber,
+            requireOffset
+                ? { required: true }
+                : { required: false, defaultValue: { default: 0 } }
+        ),
         sampleStart: assertHeader('SAMPLESTART', assertNumber),
         sampleLength: assertHeader('SAMPLELENGTH', assertNumber),
         selectable,
