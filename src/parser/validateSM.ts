@@ -42,6 +42,10 @@ export const validateSM = (
                 if (typeof val === 'number') {
                     return val.toString();
                 }
+                // if list, then concat list with spaces
+                if (Array.isArray(val)) {
+                    return val.join(', ');
+                }
 
                 throw originalError;
             },

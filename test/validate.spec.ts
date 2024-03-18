@@ -7,7 +7,7 @@ describe('validate', () => {
         const expected = {
             header: {
                 version: 0.81,
-                title: 'Elvis',
+                title: 'Elvis, The resistance',
                 subtitle: null,
                 artist: 'AOA',
                 titleTranslit: undefined,

@@ -11,7 +11,7 @@ describe('parse', () => {
             const parsedSM = parseSM(smContent);
 
             const validatedSSC = validateSM(parsedSM, false);
-            console.log(validatedSSC);
+            // console.log(validatedSSC);
 
             // write into disk validatedSSC as json file
             await fs.writeFile(
